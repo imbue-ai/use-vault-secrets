@@ -1,4 +1,4 @@
-# `export-secrets` GitHub composite action
+# `use-vault-secrets` GitHub composite action
 
 Authenticate to Imbue Vault from GitHub Actions and inject secrets into the job
 environment. The action authenticates with a GitHub OIDC token (no static
