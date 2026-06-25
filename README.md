@@ -25,7 +25,7 @@ jobs:
       id-token: write   # required: lets the job mint an OIDC token
       contents: read
     steps:
-      - uses: imbue-ai/vault-public@main
+      - uses: imbue-ai/use-vault-secrets@main
         with:
           role: sculptor_test_gh
           secrets: |
