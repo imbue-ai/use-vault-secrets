@@ -1,4 +1,4 @@
-name: export-secrets
+name: use-vault-secrets
 description: >-
   Authenticate to Imbue Vault via GitHub OIDC and inject the requested secrets
   into the job environment, masking their values in the logs.
