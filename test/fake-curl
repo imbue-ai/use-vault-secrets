@@ -1,0 +1,43 @@
+#!/bin/bash
+# Fake curl used by the export-secrets-github tests. It stands in for both the
+# GitHub OIDC token endpoint and the Vault HTTP API so the real script can run
+# with no network access and no credentials. Requests are dispatched by URL (the
+# final positional argument); the secret value is taken from $FAKE_SECRET_VALUE.
+#
+# vault_api calls curl with `--write-out '\n%{http_code}'` and parses the last
+# line as the HTTP status, so we append a "\n200" status line only when that
+# flag is present. The OIDC token request does not use it and gets a bare body.
+set -euo pipefail
+
+has_write_out=0
+url=''
+for arg in "$@"; do
+  [[ "$arg" == "--write-out" ]] && has_write_out=1
+  url="$arg" # the URL is always the final positional argument
+done
+
+emit() {
+  # emit BODY: print the body, plus a trailing status line when the caller
+  # (vault_api) asked for the HTTP code via --write-out.
+  printf '%s' "$1"
+  (( has_write_out )) && printf '\n200'
+  return 0
+}
+
+case "$url" in
+  *"auth/jwt_github_actions/login"*)
+    emit '{"auth":{"client_token":"fake.vault.token"}}'
+    ;;
+  *"secrets/data/"*)
+    emit "$(jq -n --arg v "${FAKE_SECRET_VALUE-}" \
+      '{data:{data:{value:$v},metadata:{version:1}}}')"
+    ;;
+  *"audience="*)
+    # GitHub OIDC token request (no --write-out, so no status line).
+    printf '%s' '{"value":"fake.oidc.jwt"}'
+    ;;
+  *)
+    echo "fake-curl: unexpected request URL: $url" >&2
+    exit 1
+    ;;
+esac

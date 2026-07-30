@@ -1,0 +1,18 @@
+# Runs the offline unit tests for the export-secrets-github script (test/run.sh).
+# These drive the real script against a fake curl standing in for Vault and the
+# GitHub OIDC endpoint, so they need no secrets, no OIDC token, and no live
+# Vault -- unlike test-export-secrets.yml, they run for fork pull requests too.
+name: Test export-secrets script
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-script:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run script tests
+        run: bash test/run.sh
