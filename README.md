@@ -52,6 +52,16 @@ Reference the action as `@main` to always use its latest version.
 |--------|-------------|
 | `pinned` | Space-separated `path@version` for each fetched secret, for reproducibility. |
 
+## Environment variables set
+
+Besides one variable per requested secret, the action exports:
+
+| Variable | Description |
+|----------|-------------|
+| `VAULT_ADDR`, `VAULT_NAMESPACE` | The Vault server and namespace the secrets came from. |
+| `VAULT_TOKEN` | Only with `export-token: true`. |
+| `VAULT_SECRET_ENV_NAMES` | Comma-separated names of every variable the action has injected into the job so far, across all of its invocations in that job (for example `MODAL_TOKEN_ID,MODAL_TOKEN_SECRET`). Later steps use it to know which variables hold credentials, for example to redact their values from logs or artifacts, instead of guessing from variable names. |
+
 ## Requirements
 
 - The job must request `permissions: id-token: write`.
